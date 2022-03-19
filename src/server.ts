@@ -1,7 +1,18 @@
 import express, { Request, Response } from 'express'
 import cors, { CorsOptions } from 'cors'
+import { create } from './controllers/tutorial.controller'
+import db from './config/db.config'
 
 const app: express.Application = express()
+
+// ! DB connection
+db.authenticate()
+  .then(() => {
+    console.log('Database connected...')
+  })
+  .catch((err: any) => {
+    console.log(`Error: ${err}`)
+  })
 
 const corsOptions: CorsOptions = {
   // todo set origin
@@ -19,10 +30,12 @@ app.use(express.json())
 
 app.use(express.urlencoded({ extended: true }))
 
-//simple route
+// simple route
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to bezkoder application' })
 })
+
+app.post('/', create)
 
 const PORT: string = process.env.PORT || '8080'
 app.listen(PORT, () => {

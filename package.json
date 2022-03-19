@@ -3,11 +3,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "concurrently \"tsc -w\" \"nodemon dist/js/server.js \"",
-    "dev": "ts-node-dev --respawn --pretty --transpile-only src/server.ts"
+    "start": "concurrently \"tsc -w\" \"nodemon dist/js/server.js \""
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
+    "@types/sequelize": "^4.28.11",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
     "concurrently": "^7.0.0",
