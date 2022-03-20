@@ -31,20 +31,6 @@ export interface ITutorialInstance
   extends Model<ITutorial, ITutorialCreationAttributes>,
     ITutorial {}
 
-/* // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ITutorialOptional
-  extends Optional<ITutorial, 'id' | 'createdAt' | 'updatedAt'> {}
-
-export interface ITutorialInstance
-  extends Model<ITutorial, ITutorialOptional>,
-    ITutorial {
-  createdAt?: Date
-  updatedAt?: Date
-}
-
-// Need to declare the static model so `findOne` etc. use correct types.
-
- */
 export type ITutorialStatic = typeof Model & {
   new (values?: object, options?: BuildOptions): ITutorial
 }
