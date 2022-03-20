@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { ITutorial, ITutorialStatic } from '../types.d'
-import db from '../config/db.config'
+import { db } from '../config/db.config'
 import Tutorial from '../models/tutorial.model'
 
 export const create = (

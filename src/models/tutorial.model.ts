@@ -1,31 +1,18 @@
 import {
+  CreationOptional,
   DataTypes,
-  ModelStatic,
-  ModelAttributeColumnOptions,
-  Model,
   InferAttributes,
   InferCreationAttributes,
-  CreationOptional,
-  Attributes,
+  Model,
 } from 'sequelize'
-import db from '../config/db.config'
-import { ITutorial, ITutorialStatic } from '../types.js'
+import { db as sequelize } from '../config/db.config'
+import { ITutorial, ITutorialOptional, ITutorialStatic } from '../types.js'
 
-export function getAttributeMetadata<M extends Model>(
-  model: ModelStatic<M>,
-  attributeName: keyof Attributes<M>
-): ModelAttributeColumnOptions {
-  const attribute = model.rawAttributes[attributeName]
-  if (attribute == null) {
-    throw new Error(
-      `Attribute ${attributeName} does not exist on model ${model.name}`
-    )
-  }
-
-  return attribute
-}
-
-const Tutorial = db.define<ITutorial>('tutorial', {
+const Tutorial = sequelize.define<ITutorial>('tutorial', {
+  id: {
+    primaryKey: true,
+    type: DataTypes.INTEGER,
+  },
   title: {
     type: DataTypes.STRING,
   },
@@ -37,6 +24,38 @@ const Tutorial = db.define<ITutorial>('tutorial', {
   },
 }) as ITutorialStatic
 
-Tutorial.sync()
+Tutorial.sync({ force: true })
 
 export default Tutorial
+
+/* class Tutorial extends Model<InferAttributes<Tutorial>, InferCreationAttributes<Tutorial>> {
+   declare id: CreationOptional<number>, 
+   declare createdAt: CreationOptional<Date>
+   declare updatedAt: CreationOptional<Date>
+   declare id: CreationOptional<number>, 
+   title?: {
+    type: DataTypes.STRING
+  },
+  description?: {
+    type: DataTypes.STRING
+  },
+  published!: {
+    type: DataTypes.BOOLEAN
+  }, 
+}
+Tutorial.init({
+  id: {
+    type: DataTypes.INTEGER.UNSIGNED
+  },
+  title: {
+    type: DataTypes.STRING,
+  },
+  description: {
+    type: DataTypes.STRING,
+  },
+  published: {
+    type: DataTypes.BOOLEAN,
+  },
+  createdAt: DataTypes.DATE,
+  updatedAt: DataTypes.DATE
+},{sequelize, modelName:'tutorial' }) */

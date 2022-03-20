@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express'
 import cors, { CorsOptions } from 'cors'
 import { create } from './controllers/tutorial.controller'
-import db from './config/db.config'
+import { db } from './config/db.config'
 
 const app: express.Application = express()
 
@@ -10,7 +10,7 @@ db.authenticate()
   .then(() => {
     console.log('Database connected...')
   })
-  .catch((err: any) => {
+  .catch((err: Error) => {
     console.log(`Error: ${err}`)
   })
 

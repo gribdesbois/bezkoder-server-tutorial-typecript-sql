@@ -12,9 +12,8 @@ const pool = {
   acquire: 30000,
   idle: 10000,
 }
-const db = new Sequelize({
+export const db = new Sequelize({
   dialect: DIALECT,
   storage: PATH_TO_DB,
   pool,
 })
-export default db
