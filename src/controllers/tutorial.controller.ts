@@ -51,3 +51,26 @@ export const findAll = (
       })
     )
 }
+
+export const findOne = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { id } = req.params
+  return Tutorial.findByPk(id)
+    .then((data: Tutorial | null) => {
+      if (data) {
+        res.status(200).json(data)
+      } else {
+        res.status(404).json({
+          message: `Cannot find Tutorial with id=${id}.`,
+        })
+      }
+    })
+    .catch((err: Error) => {
+      res.status(500).json({
+        message: `Error retrieving Tutorial with id=${id}`,
+      })
+    })
+}
