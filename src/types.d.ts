@@ -34,3 +34,7 @@ export interface ITutorialInstance
 export type ITutorialStatic = typeof Model & {
   new (values?: object, options?: BuildOptions): ITutorial
 }
+export interface IPage {
+  page: number
+  size: number
+}

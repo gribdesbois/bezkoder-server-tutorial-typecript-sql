@@ -1,9 +1,39 @@
 /* eslint-disable prefer-destructuring */
 import { Request, Response, NextFunction } from 'express'
 import { Op, WhereOptions } from 'sequelize'
-import { ITutorial, ITutorialStatic } from '../types.d'
+import { IPage, ITutorial, ITutorialStatic } from '../types.d'
 import { db } from '../config/db.config'
 import Tutorial from '../models/tutorial.model'
+
+const getPagination = (
+  page: number,
+  size: number
+): { limit: number; offset: number } => {
+  const limit = size ? +size : 3
+  const offset = page ? page * limit : 0
+
+  return { limit, offset }
+}
+// todo get a better type for data
+const getPagingData = (
+  data: any,
+  page: number,
+  limit: number
+): {
+  totalItems: number
+  tutorials: ITutorial
+  totalPages: number
+  currentPage: number
+} => {
+  const {
+    count: totalItems,
+    rows: tutorials,
+  }: { count: number; rows: ITutorial } = data
+  const currentPage = page ? +page : 0
+  const totalPages = Math.ceil(totalItems / limit)
+
+  return { totalItems, tutorials, totalPages, currentPage }
+}
 
 export const createTutorial = (
   req: Request,
@@ -39,9 +69,13 @@ export const findAllTutos = (
   res: Response,
   next: NextFunction
 ): Promise<Response<any, Record<string, any>> | undefined> | undefined => {
+  const { page, size } = req.query
+  const parsedPage = parseInt(page as string, 10)
+  const parsedSize = parseInt(size as string, 10)
   const title = req.query.title as WhereOptions<ITutorial> | undefined
+  const { limit, offset } = getPagination(parsedPage, parsedSize)
 
-  return Tutorial.findAll({ where: title })
+  return Tutorial.findAll({ where: title, limit, offset })
 
     .then((data: Tutorial[]) => res.status(200).json(data))
 
@@ -153,9 +187,14 @@ export const findAllPublished = (
   next: NextFunction
   // eslint-disable-next-line arrow-body-style
 ): Promise<void> => {
-  return Tutorial.findAll({ where: { published: true } })
-    .then((data: Tutorial[]) => {
-      res.status(200).json(data)
+  const { page, size } = req.query
+  const parsedPage = parseInt(page as string, 10)
+  const parsedSize = parseInt(size as string, 10)
+  const { limit, offset } = getPagination(parsedPage, parsedSize)
+  return Tutorial.findAndCountAll({ where: { published: true }, limit, offset })
+    .then((data /* : Tutorial[] */) => {
+      const response = getPagingData(data, parsedPage, limit)
+      res.status(200).json(response)
     })
     .catch((err: Error) => {
       res.status(500).json({
