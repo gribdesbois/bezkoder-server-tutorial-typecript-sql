@@ -25,7 +25,7 @@ export const createTutorial = (
   const newTutorial: ITutorialStatic = new Tutorial(tutorial)
   newTutorial
     .save()
-    .then((data: Response) => res.status(201).json(data))
+    .then((data: Tutorial) => res.status(201).json(data))
     .catch((err: Error) =>
       res.status(500).json({
         message:
@@ -94,7 +94,7 @@ export const updateTuto = (
         })
       }
     })
-    .catch((err: Error) => {
+    .catch((): void => {
       res.status(500).json({
         message: `Error updating Tutorial with id=${id}`,
       })
@@ -110,8 +110,8 @@ export const deleteTuto = (
   return Tutorial.destroy({
     where: id,
   })
-    .then((response) => {
-      if (response) {
+    .then((num: number) => {
+      if (num === 1) {
         res.status(200).json({ message: 'Tutorial deleted successfully' })
       } else {
         res.status(500).json({
@@ -119,9 +119,47 @@ export const deleteTuto = (
         })
       }
     })
-    .catch((err: Error) => {
+    .catch((): void => {
       res.status(500).send({
         message: `Could not delete Tutorial with id=${id}`,
+      })
+    })
+}
+
+export const deleteAllTutos = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> =>
+  Tutorial.destroy({
+    where: {},
+    truncate: false,
+  })
+    .then((nums: number) => {
+      res.status(200).json({
+        message: `${nums} tutorials deleted successfully!`,
+      })
+    })
+    .catch((err: Error) => {
+      res.status(500).json({
+        message:
+          err.message || 'Some error occured while removing all tutorials',
+      })
+    })
+
+export const findAllPublished = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+  // eslint-disable-next-line arrow-body-style
+): Promise<void> => {
+  return Tutorial.findAll({ where: { published: true } })
+    .then((data: Tutorial[]) => {
+      res.status(200).json(data)
+    })
+    .catch((err: Error) => {
+      res.status(500).json({
+        message: err.message || 'Some error occured while retrieving tutorials',
       })
     })
 }
