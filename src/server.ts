@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 import cors, { CorsOptions } from 'cors'
-import { create } from './controllers/tutorial.controller'
+import { createTutorial } from './controllers/tutorial.controller'
 import { db } from './config/db.config'
 
 const app: express.Application = express()
@@ -35,7 +35,7 @@ app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to bezkoder application' })
 })
 
-app.post('/', create)
+app.post('/', createTutorial)
 
 const PORT: string = process.env.PORT || '8080'
 app.listen(PORT, () => {

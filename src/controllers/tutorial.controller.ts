@@ -1,10 +1,11 @@
+/* eslint-disable prefer-destructuring */
 import { Request, Response, NextFunction } from 'express'
 import { Op, WhereOptions } from 'sequelize'
 import { ITutorial, ITutorialStatic } from '../types.d'
 import { db } from '../config/db.config'
 import Tutorial from '../models/tutorial.model'
 
-export const create = (
+export const createTutorial = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -33,7 +34,7 @@ export const create = (
     )
 }
 
-export const findAll = (
+export const findAllTutos = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -52,7 +53,7 @@ export const findAll = (
     )
 }
 
-export const findOne = (
+export const findOneTuto = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -75,7 +76,7 @@ export const findOne = (
     })
 }
 
-export const update = (
+export const updateTuto = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -96,6 +97,31 @@ export const update = (
     .catch((err: Error) => {
       res.status(500).json({
         message: `Error updating Tutorial with id=${id}`,
+      })
+    })
+}
+
+export const deleteTuto = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const id = req.params.id as unknown as WhereOptions<ITutorial> | undefined
+  return Tutorial.destroy({
+    where: id,
+  })
+    .then((response) => {
+      if (response) {
+        res.status(200).json({ message: 'Tutorial deleted successfully' })
+      } else {
+        res.status(500).json({
+          message: `Could not delete Tutorial with id=${id}. Maybe Tutorial was not found!`,
+        })
+      }
+    })
+    .catch((err: Error) => {
+      res.status(500).send({
+        message: `Could not delete Tutorial with id=${id}`,
       })
     })
 }
