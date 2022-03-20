@@ -39,7 +39,15 @@ export const findAll = (
   next: NextFunction
 ): Promise<Response<any, Record<string, any>> | undefined> | undefined => {
   const title = req.query.title as WhereOptions<ITutorial> | undefined
-  /* const condition = title ? { title: { [Op.like]: `%${title}%` } } : null */
 
-  Tutorial.findAll({ where: title })
+  return Tutorial.findAll({ where: title })
+
+    .then((data: Tutorial[]) => res.status(200).json(data))
+
+    .catch((err: Error) =>
+      res.status(500).json({
+        message:
+          err.message || 'Some error occurred while retrieving the Tutorials',
+      })
+    )
 }
