@@ -6,56 +6,60 @@ import {
   Model,
 } from 'sequelize'
 import { db as sequelize } from '../config/db.config'
-import { ITutorial, ITutorialOptional, ITutorialStatic } from '../types.js'
+import {
+  ITutorial,
+  ITutorialInstance,
+  ITutorialCreationAttributes,
+} from '../types.d'
 
-const Tutorial = sequelize.define<ITutorial>('tutorial', {
-  id: {
-    primaryKey: true,
-    type: DataTypes.INTEGER,
+// class entity
+class Tutorial
+  extends Model<ITutorial, ITutorialCreationAttributes>
+  implements ITutorial
+{
+  declare id: string
+
+  declare name: string
+
+  declare title: string
+
+  declare description: string
+
+  declare published: boolean
+
+  declare readonly createdAt: Date
+
+  declare readonly updatedAt: Date
+
+  declare readonly deletedAt: Date
+}
+
+// init model
+Tutorial.init(
+  {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    name: {
+      type: DataTypes.STRING,
+    },
+    title: {
+      type: DataTypes.STRING,
+    },
+    description: {
+      type: DataTypes.STRING,
+    },
+    published: {
+      type: DataTypes.BOOLEAN,
+    },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
   },
-  title: {
-    type: DataTypes.STRING,
-  },
-  description: {
-    type: DataTypes.STRING,
-  },
-  published: {
-    type: DataTypes.BOOLEAN,
-  },
-}) as ITutorialStatic
+  { sequelize, modelName: 'tutorial' }
+)
 
 Tutorial.sync({ force: true })
 
 export default Tutorial
-
-/* class Tutorial extends Model<InferAttributes<Tutorial>, InferCreationAttributes<Tutorial>> {
-   declare id: CreationOptional<number>, 
-   declare createdAt: CreationOptional<Date>
-   declare updatedAt: CreationOptional<Date>
-   declare id: CreationOptional<number>, 
-   title?: {
-    type: DataTypes.STRING
-  },
-  description?: {
-    type: DataTypes.STRING
-  },
-  published!: {
-    type: DataTypes.BOOLEAN
-  }, 
-}
-Tutorial.init({
-  id: {
-    type: DataTypes.INTEGER.UNSIGNED
-  },
-  title: {
-    type: DataTypes.STRING,
-  },
-  description: {
-    type: DataTypes.STRING,
-  },
-  published: {
-    type: DataTypes.BOOLEAN,
-  },
-  createdAt: DataTypes.DATE,
-  updatedAt: DataTypes.DATE
-},{sequelize, modelName:'tutorial' }) */
