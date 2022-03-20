@@ -74,3 +74,28 @@ export const findOne = (
       })
     })
 }
+
+export const update = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const id = req.params.id as unknown as WhereOptions<ITutorial>
+  return Tutorial.update(req.body, { where: id })
+    .then((tuto) => {
+      if (tuto) {
+        res.status(200).json({
+          message: 'Tutorial updated successfully',
+        })
+      } else {
+        res.status(500).json({
+          message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found or req.body is empty`,
+        })
+      }
+    })
+    .catch((err: Error) => {
+      res.status(500).json({
+        message: `Error updating Tutorial with id=${id}`,
+      })
+    })
+}
