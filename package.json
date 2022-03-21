@@ -3,7 +3,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "concurrently \"tsc -w\" \"nodemon dist/js/server.js \""
+    "start": "concurrently \"tsc -w\" \"nodemon --inspect dist/js/server.js \""
   },
   "devDependencies": {
     "@types/node": "^17.0.21",

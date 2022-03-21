@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import cors, { CorsOptions } from 'cors'
 import { createTutorial } from './controllers/tutorial.controller'
 import { db } from './config/db.config'
+import { router as routes } from './routes/tutorial.routes'
 
 const app: express.Application = express()
 
@@ -30,12 +31,8 @@ app.use(express.json())
 
 app.use(express.urlencoded({ extended: true }))
 
-// simple route
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Welcome to bezkoder application' })
-})
-
-app.post('/', createTutorial)
+// routes
+app.use('/api', routes)
 
 const PORT: string = process.env.PORT || '8080'
 app.listen(PORT, () => {

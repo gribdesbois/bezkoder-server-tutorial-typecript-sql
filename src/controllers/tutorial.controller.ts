@@ -94,7 +94,7 @@ export const findOneTuto = (
 ): Promise<void> => {
   const { id } = req.params
   return Tutorial.findByPk(id)
-    .then((data: Tutorial | null) => {
+    .then((data /* : Tutorial | null */) => {
       if (data) {
         res.status(200).json(data)
       } else {
@@ -116,7 +116,13 @@ export const updateTuto = (
   next: NextFunction
 ): Promise<void> => {
   const id = req.params.id as unknown as WhereOptions<ITutorial>
-  return Tutorial.update(req.body, { where: id })
+  const body = req.body as unknown as Tutorial
+  return Tutorial.update(
+    {
+      ...body,
+    },
+    { where: { id } }
+  )
     .then((tuto) => {
       if (tuto) {
         res.status(200).json({
@@ -142,7 +148,7 @@ export const deleteTuto = (
 ): Promise<void> => {
   const id = req.params.id as unknown as WhereOptions<ITutorial> | undefined
   return Tutorial.destroy({
-    where: id,
+    where: { id },
   })
     .then((num: number) => {
       if (num === 1) {
@@ -192,7 +198,7 @@ export const findAllPublished = (
   const parsedSize = parseInt(size as string, 10)
   const { limit, offset } = getPagination(parsedPage, parsedSize)
   return Tutorial.findAndCountAll({ where: { published: true }, limit, offset })
-    .then((data /* : Tutorial[] */) => {
+    .then((data /* : ITutorial[] */) => {
       const response = getPagingData(data, parsedPage, limit)
       res.status(200).json(response)
     })

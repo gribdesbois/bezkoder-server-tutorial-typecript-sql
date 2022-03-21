@@ -61,6 +61,6 @@ Tutorial.init(
   { sequelize, modelName: 'tutorial' }
 )
 
-Tutorial.sync({ force: true })
+Tutorial.sync(/* { force: true } */)
 
 export default Tutorial
