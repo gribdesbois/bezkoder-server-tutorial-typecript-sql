@@ -75,7 +75,7 @@ export const findAllTutos = (
   const title = req.query.title as WhereOptions<ITutorial> | undefined
   const { limit, offset } = getPagination(parsedPage, parsedSize)
 
-  return Tutorial.findAll({ where: title, limit, offset })
+  return Tutorial.findAll({ where: { title }, limit, offset })
 
     .then((data: Tutorial[]) => res.status(200).json(data))
 
