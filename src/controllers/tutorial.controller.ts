@@ -94,7 +94,7 @@ export const findOneTuto = (
 ): Promise<void> => {
   const { id } = req.params
   return Tutorial.findByPk(id)
-    .then((data /* : Tutorial | null */) => {
+    .then((data: Tutorial | null) => {
       if (data) {
         res.status(200).json(data)
       } else {
