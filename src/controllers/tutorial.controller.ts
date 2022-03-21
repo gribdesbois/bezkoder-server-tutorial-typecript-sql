@@ -35,11 +35,11 @@ const getPagingData = (
   return { totalItems, tutorials, totalPages, currentPage }
 }
 
-export const createTutorial = (
+export const createTutorial = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<Response<any, Record<string, any>> | undefined> | undefined => {
+): Promise<void> => {
   // Validate request
   if (!req.body.title) {
     res.status(400).send({
@@ -53,141 +53,138 @@ export const createTutorial = (
   }
   // save Tutorial in the database
   const newTutorial: ITutorialStatic = new Tutorial(tutorial)
-  newTutorial
-    .save()
-    .then((data: Tutorial) => res.status(201).json(data))
-    .catch((err: Error) =>
-      res.status(500).json({
-        message:
-          err.message || 'Some error occurred while creating the Tutorial',
-      })
-    )
+  try {
+    const dataSaved: Tutorial = await newTutorial.save()
+    res.status(201).json(dataSaved)
+  } catch (err: any) {
+    res.status(500).json({
+      message: err.message || 'Some error occurred while creating the Tutorial',
+    })
+  }
 }
 
-export const findAllTutos = (
+export const findAllTutos = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<Response<any, Record<string, any>> | undefined> | undefined => {
+): Promise<void> => {
   const { page, size } = req.query
   const parsedPage = parseInt(page as string, 10)
   const parsedSize = parseInt(size as string, 10)
   const title = req.query.title as WhereOptions<ITutorial> | undefined
   const { limit, offset } = getPagination(parsedPage, parsedSize)
 
-  return Tutorial.findAll({ where: { title }, limit, offset })
-
-    .then((data: Tutorial[]) => res.status(200).json(data))
-
-    .catch((err: Error) =>
-      res.status(500).json({
-        message:
-          err.message || 'Some error occurred while retrieving the Tutorials',
-      })
-    )
+  try {
+    const tutorials: Tutorial[] = await Tutorial.findAll({
+      where: { title },
+      limit,
+      offset,
+    })
+    res.status(200).json(tutorials)
+  } catch (err: any) {
+    res.status(500).json({
+      message:
+        err.message || 'Some error occurred while retrieving the Tutorials',
+    })
+  }
 }
 
-export const findOneTuto = (
+export const findOneTuto = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   const { id } = req.params
-  return Tutorial.findByPk(id)
-    .then((data: Tutorial | null) => {
-      if (data) {
-        res.status(200).json(data)
-      } else {
-        res.status(404).json({
-          message: `Cannot find Tutorial with id=${id}.`,
-        })
-      }
-    })
-    .catch((err: Error) => {
-      res.status(500).json({
-        message: `Error retrieving Tutorial with id=${id}`,
+  try {
+    const data = await Tutorial.findByPk(id)
+    if (data) {
+      res.status(200).json(data)
+    } else {
+      res.status(404).json({
+        message: `Cannot find Tutorial with id=${id}.`,
       })
+    }
+  } catch (err) {
+    res.status(500).json({
+      message: `Error retrieving Tutorial with id=${id}`,
     })
+  }
 }
 
-export const updateTuto = (
+export const updateTuto = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   const id = req.params.id as unknown as WhereOptions<ITutorial>
   const body = req.body as unknown as Tutorial
-  return Tutorial.update(
-    {
-      ...body,
-    },
-    { where: { id } }
-  )
-    .then((tuto) => {
-      if (tuto) {
-        res.status(200).json({
-          message: 'Tutorial updated successfully',
-        })
-      } else {
-        res.status(500).json({
-          message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found or req.body is empty`,
-        })
-      }
-    })
-    .catch((): void => {
-      res.status(500).json({
-        message: `Error updating Tutorial with id=${id}`,
+  try {
+    const tuto = await Tutorial.update(
+      {
+        ...body,
+      },
+      { where: { id } }
+    )
+    if (tuto) {
+      res.status(200).json({
+        message: 'Tutorial updated successfully',
       })
+    } else {
+      res.status(500).json({
+        message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found or req.body is empty`,
+      })
+    }
+  } catch {
+    res.status(500).json({
+      message: `Error updating Tutorial with id=${id}`,
     })
+  }
 }
 
-export const deleteTuto = (
+export const deleteTuto = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   const id = req.params.id as unknown as WhereOptions<ITutorial> | undefined
-  return Tutorial.destroy({
-    where: { id },
-  })
-    .then((num: number) => {
-      if (num === 1) {
-        res.status(200).json({ message: 'Tutorial deleted successfully' })
-      } else {
-        res.status(500).json({
-          message: `Could not delete Tutorial with id=${id}. Maybe Tutorial was not found!`,
-        })
-      }
+  try {
+    const num = await Tutorial.destroy({
+      where: { id },
     })
-    .catch((): void => {
-      res.status(500).send({
-        message: `Could not delete Tutorial with id=${id}`,
+    if (num === 1) {
+      res.status(200).json({ message: 'Tutorial deleted successfully' })
+    } else {
+      res.status(500).json({
+        message: `Could not delete Tutorial with id=${id}. Maybe Tutorial was not found!`,
       })
+    }
+  } catch {
+    res.status(500).send({
+      message: `Could not delete Tutorial with id=${id}`,
     })
+  }
 }
 
-export const deleteAllTutos = (
+export const deleteAllTutos = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> =>
-  Tutorial.destroy({
-    where: {},
-    truncate: false,
-  })
-    .then((nums: number) => {
-      res.status(200).json({
-        message: `${nums} tutorials deleted successfully!`,
-      })
+): Promise<void> => {
+  try {
+    const nums: number = await Tutorial.destroy({
+      where: {},
+      truncate: false,
     })
-    .catch((err: Error) => {
-      res.status(500).json({
-        message:
-          err.message || 'Some error occured while removing all tutorials',
-      })
+    res.status(200).json({
+      message: `${nums} tutorials deleted successfully!`,
     })
-
-export const findAllPublished = (
+  } catch (err: any) {
+    res.status(500).json({
+      message: err.message || 'Some error occured while removing all tutorials',
+    })
+  }
+}
+export const findAllPublished = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -197,14 +194,17 @@ export const findAllPublished = (
   const parsedPage = parseInt(page as string, 10)
   const parsedSize = parseInt(size as string, 10)
   const { limit, offset } = getPagination(parsedPage, parsedSize)
-  return Tutorial.findAndCountAll({ where: { published: true }, limit, offset })
-    .then((data /* : ITutorial[] */) => {
-      const response = getPagingData(data, parsedPage, limit)
-      res.status(200).json(response)
+  try {
+    const data /* : ITutorial[] */ = await Tutorial.findAndCountAll({
+      where: { published: true },
+      limit,
+      offset,
     })
-    .catch((err: Error) => {
-      res.status(500).json({
-        message: err.message || 'Some error occured while retrieving tutorials',
-      })
+    const response = getPagingData(data, parsedPage, limit)
+    res.status(200).json(response)
+  } catch (err: any) {
+    res.status(500).json({
+      message: err.message || 'Some error occured while retrieving tutorials',
     })
+  }
 }

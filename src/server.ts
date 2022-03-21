@@ -7,13 +7,15 @@ import { router as routes } from './routes/tutorial.routes'
 const app: express.Application = express()
 
 // ! DB connection
-db.authenticate()
-  .then(() => {
+const connect = async () => {
+  try {
+    await db.authenticate()
     console.log('Database connected...')
-  })
-  .catch((err: Error) => {
+  } catch (err: any) {
     console.log(`Error: ${err}`)
-  })
+  }
+}
+connect()
 
 const corsOptions: CorsOptions = {
   // todo set origin
@@ -32,7 +34,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // routes
-app.use('/api', routes)
+app.use('/api/tutorials', routes)
 
 const PORT: string = process.env.PORT || '8080'
 app.listen(PORT, () => {
